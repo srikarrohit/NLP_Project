@@ -487,20 +487,7 @@ In the first reaction in~\eqref{eq:MAPKrates}, a particle of the input signal \t
 {\bf The evaluation under model misspecification} We consider the Markov process model $\mathbb{M}$ with the first set of rates (see Supplementary materials). Let $[\mathbf{x},\mathbf{y},\mathbf{z}]$ be sampled from $\mathbb{M}$.
 Next, instead of the correct model we consider a misspecified model $\mathbb{M}^{\prime}$, where $v^{act}_{K2}$ is perturbed with noise sampled from Uniform$(0.1, 0.5)$.
 We denote as $\mathbb{C}^{\prime}$  the SCM corresponding to $\mathbb{M}^{\prime}$, and evaluate the counterfactual distribution $P_{\text{K3}}^{\mathbb{C}^{\prime}; \text{K3}=\mathbf{x}, \text{K2}=\mathbf{y}, \text{K}=\mathbf{z}, \text{do}(\text{K3} = x^{\prime})}$. We expect that, since the counterfactual distribution from $\mathbb{C}^{\prime}$ incorporates the data from the correct model, it should be closer to the true causal effect simulated from $\mathbb{M}$ than the direct simulation from the misspecified $\mathbb{M}^{\prime}$. We repeat this experiment 50 times.
-\begin{table}[]
-\addtolength{\parskip}{-3mm}
-\centering
-\scalebox{0.75}{
-\begin{tabular}{l|lll}
-                    & MAP3K                                                     & MAP2K                                                     & MAPK                                                     \\ \hline
-activation hazard   & $v^{act}_{K3}\text{E1}(T_{\text{K3}}-\text{K3}(t))$ & $v^{act}_{K2}\text{K3}(T_{\text{K2}}-\text{K2}(t))$ & $v^{act}_{K}\text{K2}(T_{\text{K}}-\text{K}(t))$ \\
-deactivation hazard & $v^{inh}_{K3}\text{K3}(t)$                       & $v^{inh}_{K2}\text{K2}(t)$                       & $v^{inh}_{K}\text{K}(t)$
-\end{tabular}
-}
-\caption{\small The hazard functions in Case study 1 (MAPK), specified according to mass action enzyme kinetics. \label{dyn_model}}
 
-\vspace{-5mm}
-\end{table}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Case Study 2: The IGF signaling system}

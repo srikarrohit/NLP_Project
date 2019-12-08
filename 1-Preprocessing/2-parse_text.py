@@ -1,3 +1,6 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 from __future__ import print_function
 import codecs
 import os
@@ -6,350 +9,336 @@ import collections
 import re
 import sys
 
-
 math = sys.argv[1]
 
-basepath_orig = "/home/du3/13CS30043/SNLP/Dataset/Papers_Text_New_Cat/"
+basepath_orig = \
+    "C:\Users\srika\OneDrive\Documents\Document-Summarization-master\Document-Summarization-master\Dest_files"
 
-destpath_new = "/home/du3/13CS30043/SNLP/Dataset/Papers_Text_Without_Eq_Cat/"
+destpath_new = \
+    "C:\Users\srika\OneDrive\Documents\Document-Summarization-master\Document-Summarization-master\Dest_files1"
 
-basepath = "/home/du3/13CS30043/SNLP/Dataset/Papers_Text_Without_Eq_Cat/"
-destpath = "/home/du3/13CS30043/SNLP/Dataset/all-parsed-papers-category.txt"
+# basepath = "/home/du3/13CS30043/SNLP/Dataset/Papers_Text_Without_Eq_Cat/"
+# destpath = "/home/du3/13CS30043/SNLP/Dataset/all-parsed-papers-category.txt"
 
+symbol_path = os.path.join(os.path.dirname(__file__),
+                           'Symbol_Files/symbols.txt')
 
-symbol_path = os.path.join(os.path.dirname(__file__),"Symbol_Files/symbols.txt")
+symbol_1_path = os.path.join(os.path.dirname(__file__),
+                             'Symbol_Files/symbols_1.txt')
 
-symbol_1_path = os.path.join(os.path.dirname(__file__),"Symbol_Files/symbols_1.txt")
-
-binary_path = os.path.join(os.path.dirname(__file__),"Symbol_Files/binary.txt")
+binary_path = os.path.join(os.path.dirname(__file__),
+                           'Symbol_Files/binary.txt')
 
 
 def remove_math():
-	symbols = []
+    symbols = []
 
-	binary = []
+    binary = []
 
-	symbol_file = codecs.open(symbol_path, 'r', 'utf-8')
+    symbol_file = codecs.open(symbol_path, 'r', 'utf-8')
 
-	for row in symbol_file:
-		s = row.strip().split('\t')
-		symbols.append(s[0].strip())
-		symbols.append(s[1].strip())
+    for row in symbol_file:
+        s = row.strip().split('\t')
+        symbols.append(s[0].strip())
+        symbols.append(s[1].strip())
 
-	symbol_1_file = codecs.open(symbol_1_path, 'r', 'utf-8')
+    symbol_1_file = codecs.open(symbol_1_path, 'r', 'utf-8')
 
-	for row in symbol_1_file:
-		s = row.strip().split('\t')
-		symbols.append(s[0].strip())
+    for row in symbol_1_file:
+        s = row.strip().split('\t')
+        symbols.append(s[0].strip())
 
-	binary_file = codecs.open(binary_path, 'r', 'utf-8')
+    binary_file = codecs.open(binary_path, 'r', 'utf-8')
 
-	for row in binary_file:
-		s = row.strip().split('\t')
-		binary.append(s[0].strip())
+    for row in binary_file:
+        s = row.strip().split('\t')
+        binary.append(s[0].strip())
 
+    files = os.listdir(basepath_orig)
 
-	files = os.listdir(basepath_orig)
+    symbol_string = ''
 
-	symbol_string = ""
+    for symbol in symbols:
+        symbol_string += symbol
 
-	for symbol in symbols:
-		symbol_string += symbol
+    binary_string = ''
+    for bin in binary:
+        symbol_string += bin
 
-	binary_string = ""
-	for bin in binary:
-		symbol_string += bin
+        binary_string += bin
 
-		binary_string += bin
+    print('[^ ]*[' + symbol_string + '][^ ]*')
 
+    for filename in files:
+        file = codecs.open(basepath_orig + filename, 'r', 'utf-8')
 
-	print("[^ ]*["+symbol_string+"][^ ]*")
+        destfile = codecs.open(destpath_new + filename, 'w', 'utf-8')
 
-	regex_symbol = re.compile(ur" [^ @#]*["+symbol_string+"][^ ]* ", re.U)
+        text = file.read()
 
-	regex_binary= re.compile(ur" [^ @#]* ["+binary_string+"] [^ ]* ", re.U)
+        cnt = 0
 
-	regex_min = re.compile(" [^ ]*[_][^ ]* ", re.U)
+        for m in regex_symbol.finditer(text):
+            text = text[:m.start() - cnt] + ' ||SYMBOLTOKEN|| ' \
+                + text[m.end() - cnt:]
+            cnt = cnt + m.end() - m.start() - len(' ||SYMBOLTOKEN|| ')
 
-	regex_1 = re.compile(" [a-zA-Z]+[ ]?[-/][ ]?[a-zA-Z]+ ", re.U)
+        cnt = 0
+        for m in regex_binary.finditer(text):
+            text = text[:m.start() - cnt] + ' ||MATHEQUATION|| ' \
+                + text[m.end() - cnt:]
+            cnt = cnt + m.end() - m.start() - len(' ||MATHEQUATION|| ')
 
-	regex_2 = re.compile(" [^a-zA-Z ]+[ ]?[-/][ ]?[^a-zA-Z ]+ ", re.U)
+        cnt = 0
+        for m in regex_1.finditer(text):
+            text = text[:m.start() - cnt] + ' ' + text[m.start() - cnt
+                + 1:m.end() - cnt].replace('-', '') + text[m.end()
+                - cnt:]
+            cnt = cnt + m.end() - m.start() - 1
 
+        cnt = 0
+        for m in regex_2.finditer(text):
+            text = text[:m.start() - cnt] + ' ||MATHEQUATION|| ' \
+                + text[m.end() - cnt:]
+            cnt = cnt + m.end() - m.start() - len(' ||MATHEQUATION|| ')
 
-	for filename in files:
-		file = codecs.open(basepath_orig+filename,'r','utf-8')
+        cnt = 0
+        for m in regex_min.finditer(text):
+            text = text[:m.start() - cnt] + ' ||SYMBOLTOKEN|| ' \
+                + text[m.end() - cnt:]
+            cnt = cnt + m.end() - m.start() - len(' ||SYMBOLTOKEN|| ')
 
-		destfile = codecs.open(destpath_new+filename, 'w', 'utf-8')
-
-		text = file.read()
-
-		cnt = 0
-
-		for m in regex_symbol.finditer(text):
-			text = text[:m.start()-cnt]+' ||SYMBOLTOKEN|| '+text[m.end()-cnt:]
-			cnt = cnt+(m.end()-m.start())-len(" ||SYMBOLTOKEN|| ")
-
-		cnt = 0
-		for m in regex_binary.finditer(text):
-			text = text[:m.start()-cnt]+' ||MATHEQUATION|| '+text[m.end()-cnt:]
-			cnt = cnt+(m.end()-m.start())-len(" ||MATHEQUATION|| ")
-
-
-		cnt = 0
-		for m in regex_1.finditer(text):
-			text = text[:m.start()-cnt]+' '+text[m.start()-cnt+1:m.end()-cnt].replace('-','')+text[m.end()-cnt:]
-			cnt = cnt+(m.end()-m.start())-1
-
-		cnt = 0
-		for m in regex_2.finditer(text):
-			text = text[:m.start()-cnt]+' ||MATHEQUATION|| '+text[m.end()-cnt:]
-			cnt = cnt+(m.end()-m.start())-len(" ||MATHEQUATION|| ")
-
-
-		cnt = 0
-		for m in regex_min.finditer(text):
-			text = text[:m.start()-cnt]+' ||SYMBOLTOKEN|| '+text[m.end()-cnt:]
-			cnt = cnt+(m.end()-m.start())-len(" ||SYMBOLTOKEN|| ")
-
-
-		print(text, file = destfile)
-		print(filename)
-
-
-
+        print(text, file=destfile)
+        print(filename)
 
 
 def main():
 
-	if math == "1":
-		remove_math()
+    if math == '1':
+        remove_math()
 
-	
-	files = os.listdir(basepath)
+    files = os.listdir(basepath)
 
-	destfile = codecs.open(destpath,'w','utf-8')
+    destfile = codecs.open(destpath, 'w', 'utf-8')
 
-	err_cnt = 0
-	ii = 0
+    err_cnt = 0
+    ii = 0
 
-	for filename in files:
-		try:
-			file = codecs.open(basepath+filename,'r','utf-8')
+    for filename in files:
+        try:
+            file = codecs.open(basepath + filename, 'r', 'utf-8')
 
-			title_f = False
+            title_f = False
 
-			section_f = False
+            section_f = False
 
-			sub_section_f = False
+            sub_section_f = False
 
-			sub_sub_section_f = False
+            sub_sub_section_f = False
 
-			abstract_f = False
+            abstract_f = False
 
-			formula_f = False
+            formula_f = False
 
-			table_f = False
-			figure_f = False
+            table_f = False
+            figure_f = False
 
-			title = ""
-			abstract = ""
+            title = ''
+            abstract = ''
 
+            section_head = ''
+            sub_section_head = ''
+            sub_sub_section_head = ''
 
-			section_head = ""
-			sub_section_head = ""
-			sub_sub_section_head = ""
+            section_text = ''
+            sub_section_text = ''
+            sub_sub_section_text = ''
 
-			section_text = ""
-			sub_section_text = ""
-			sub_sub_section_text = ""
+            section_s = False
+            sub_section_s = False
+            sub_sub_section_s = False
 
+            dict_file = collections.OrderedDict()
 
-			section_s = False
-			sub_section_s = False
-			sub_sub_section_s = False
+            for row in file:
 
-			dict_file = collections.OrderedDict()
+                if row.strip() == '@#^T':
+                    title_f = False
+                    continue
+                elif row.strip() == '@#^A':
+                    abstract_f = False
+                    continue
+                elif row.strip() == '@@@FORMULA@@@':
 
-			for row in file:
+                    formula_f = False
+                    continue
+                elif row.strip() == '@@@TABLE@@@':
 
-				if row.strip() == "@#^T":
-					title_f = False
-					continue
-				elif row.strip() == "@#^A":
-					abstract_f = False
-					continue
+                    table_f = False
+                    continue
+                elif row.strip() == '@@@FIGURE@@@':
 
-				elif row.strip() == "@@@FORMULA@@@":
-					formula_f = False
-					continue
+                    figure_f = False
+                    continue
 
-				elif row.strip() == "@@@TABLE@@@":
-					table_f = False
-					continue
+                if table_f == True:
+                    continue
 
-				elif row.strip() == "@@@FIGURE@@@":
-					figure_f = False
-					continue
+                if formula_f == True:
+                    continue
 
-				if table_f == True:
-					continue
+                if figure_f == True:
+                    continue
+                elif row.strip() == '@#^S':
 
-				if formula_f == True:
-					continue
+                    section_f = False
+                    section_s = True
 
-				if figure_f == True:
-					continue
+                    if section_head == '':
+                        section_head = 'DEFAULT'
 
+                    if section_head not in dict_file.keys():
+                        dict_file[section_head] = ['',
+                                collections.OrderedDict()]
+                    continue
+                elif row.strip() == '@#S^S':
 
-				elif row.strip() == "@#^S":
-					section_f = False
-					section_s = True
+                    sub_section_f = False
+                    sub_section_s = True
 
-					if section_head == '':
-						section_head = "DEFAULT"
+                    if sub_section_head == '':
+                        sub_section_head = 'DEFAULT'
 
-					if section_head not in dict_file.keys():
-						dict_file[section_head] = ["",collections.OrderedDict()]
-					continue
+                    if sub_section_head \
+                        not in dict_file[section_head][1].keys():
+                        dict_file[section_head][1][sub_section_head] = \
+                            ['', collections.OrderedDict()]
+                    continue
+                elif row.strip() == '@S#S^S':
+
+                    if sub_sub_section_head == '':
+                        sub_sub_section_head = 'DEFAULT'
+
+                    if sub_section_head.strip() \
+                        in dict_file[section_head][1]:
+
+                        sub_sub_section_f = False
+                        sub_sub_section_s = True
+
+                        # print(filename,section_head,sub_section_head,sub_sub_section_head)
+
+                        if sub_sub_section_head \
+                            not in dict_file[section_head][1][sub_section_head][1].keys():
+                            dict_file[section_head][1][sub_section_head][1][sub_sub_section_head] = \
+                                ['', collections.OrderedDict()]
+                    else:
+                        sub_section_f = False
+                        sub_section_s = True
+
+                        if sub_section_head == '':
+                            sub_section_head = 'DEFAULT'
+
+                        if sub_section_head.strip() \
+                            not in dict_file[section_head][1].keys():
+                            dict_file[section_head][1][sub_section_head] = \
+                                ['', collections.OrderedDict()]
 
-				elif row.strip() == "@#S^S":
-					sub_section_f = False
-					sub_section_s = True
+                        if sub_sub_section_head \
+                            not in dict_file[section_head][1][sub_section_head][1].keys():
+                            dict_file[section_head][1][sub_section_head][1][sub_sub_section_head] = \
+                                ['', collections.OrderedDict()]
 
-					if sub_section_head == '':
-						sub_section_head = 'DEFAULT'
+                    continue
 
+                if title_f == True:
+                    title = title + row.strip() + ' '
+                elif abstract_f == True:
 
-					if sub_section_head not in dict_file[section_head][1].keys():
-						dict_file[section_head][1][sub_section_head] = ["",collections.OrderedDict()]
-					continue
+                    abstract = abstract + row.strip() + ' '
+                elif section_f == True:
 
-				elif row.strip() == "@S#S^S":
+                    section_head = section_head + row.strip()
+                elif section_f == True:
 
-					if sub_sub_section_head == '':
-						sub_sub_section_head = 'DEFAULT'
+                    section_head = section_head + row.strip()
+                elif sub_section_f == True:
 
-					if sub_section_head.strip() in dict_file[section_head][1]:
+                    sub_section_head = sub_section_head + row.strip()
+                elif sub_sub_section_f == True:
 
-						sub_sub_section_f = False
-						sub_sub_section_s = True
+                    sub_sub_section_head = sub_sub_section_head \
+                        + row.strip()
 
-						# print(filename,section_head,sub_section_head,sub_sub_section_head)
+                if row.strip() == '@#!T':
+                    title_f = True
+                elif row.strip() == '@#!A':
+                    abstract_f = True
+                elif row.strip() == '@#!S':
+                    section_f = True
+                    section_head = ''
+                    sub_sub_section_s = False
+                    sub_section_s = False
+                    section_s = False
+                elif row.strip() == '###FORMULA###':
 
-						if sub_sub_section_head not in dict_file[section_head][1][sub_section_head][1].keys():
-							dict_file[section_head][1][sub_section_head][1][sub_sub_section_head] = ["",collections.OrderedDict()]
-					else:
-						sub_section_f = False
-						sub_section_s = True
+                    row = '||FORMULA||'
+                    formula_f = True
+                elif row.strip() == '###TABLE###':
+                    row = '||TABLE||'
+                    table_f = True
+                elif row.strip() == '###FIGURE###':
 
-						if sub_section_head == '':
-							sub_section_head = 'DEFAULT'
+                    row = '||FIGURE||'
+                    figure_f = True
+                elif row.strip() == '@#S!S':
 
+                    sub_section_f = True
 
-						if sub_section_head.strip() not in dict_file[section_head][1].keys():
-							dict_file[section_head][1][sub_section_head] = ["",collections.OrderedDict()]
-						
-						if sub_sub_section_head not in dict_file[section_head][1][sub_section_head][1].keys():
-							dict_file[section_head][1][sub_section_head][1][sub_sub_section_head] = ["",collections.OrderedDict()]
+                    sub_section_head = ''
+                    sub_sub_section_s = False
+                    sub_section_s = False
+                    section_s = False
+                elif row.strip() == '@S#S!S':
 
-					continue
+                    sub_sub_section_f = True
 
-				if title_f == True:
-					title = title+row.strip()+" "
+                    sub_sub_section_head = ''
+                    sub_sub_section_s = False
+                    section_s = False
+                    sub_section_s = False
 
-				elif abstract_f == True:
-					abstract = abstract+row.strip()+" "
+                if section_s == True:
+                    dict_file[section_head][0] = \
+                        dict_file[section_head][0] + row
+                elif sub_section_s == True:
 
-				elif section_f == True:
-					section_head = section_head+row.strip()
+                    dict_file[section_head][1][sub_section_head][0] = \
+                        dict_file[section_head][1][sub_section_head][0] \
+                        + row
+                elif sub_sub_section_s == True:
 
-				elif section_f == True:
-					section_head = section_head+row.strip()
+                    dict_file[section_head][1][sub_section_head][1][sub_sub_section_head][0] = \
+                        dict_file[section_head][1][sub_section_head][1][sub_sub_section_head][0] \
+                        + row
+            print(filename)
 
-				elif sub_section_f == True:
-					sub_section_head = sub_section_head+row.strip()
+            if dict_file != collections.OrderedDict():
+                print(str(filename) + '\t' + str(title.strip()) + '\t'
+                      + json.dumps(dict_file) + '\t'
+                      + abstract.strip(), file=destfile)
 
-				elif sub_sub_section_f == True:
-					sub_sub_section_head = sub_sub_section_head+row.strip()
+                ii = ii + 1
+        except:
 
+                # if ii == 100:
+                # ....break
 
+            print('Error', filename)
+            err_cnt += 1
 
+    print('Error Count ', err_cnt)
+    print('Total Count ', ii)
 
 
-				if row.strip() == "@#!T":
-					title_f = True
-				elif row.strip() == "@#!A":
-					abstract_f = True
-				elif row.strip() == "@#!S":
-					section_f = True
-					section_head = ""
-					sub_sub_section_s= False
-					sub_section_s = False
-					section_s = False
-
-					
-				elif row.strip() == "###FORMULA###":
-					row = "||FORMULA||"
-					formula_f = True
-				elif row.strip() == "###TABLE###":
-					row = "||TABLE||"
-					table_f = True
-
-				elif row.strip() == "###FIGURE###":
-					row = "||FIGURE||"
-					figure_f = True
-
-
-					
-
-				elif row.strip() == "@#S!S":
-					sub_section_f = True
-
-					sub_section_head = ""
-					sub_sub_section_s= False
-					sub_section_s = False
-					section_s = False
-
-
-				elif row.strip() == "@S#S!S":
-
-				
-					sub_sub_section_f = True
-
-					sub_sub_section_head = ""
-					sub_sub_section_s= False
-					section_s = False
-					sub_section_s = False
-
-
-				if section_s == True:
-					dict_file[section_head][0] = dict_file[section_head][0]+row
-
-				elif sub_section_s == True:
-					dict_file[section_head][1][sub_section_head][0] = dict_file[section_head][1][sub_section_head][0]+row
-
-				elif sub_sub_section_s == True:
-					dict_file[section_head][1][sub_section_head][1][sub_sub_section_head][0] = dict_file[section_head][1][sub_section_head][1][sub_sub_section_head][0]+row
-			print(filename)
-
-			if dict_file != collections.OrderedDict():
-				print(str(filename)+"\t"+str(title.strip())+'\t'+json.dumps(dict_file)+'\t'+abstract.strip(), file= destfile)
-
-				ii = ii+1
-
-				# if ii == 100:
-				# 	break
-
-		except:
-			print("Error",filename)
-			err_cnt += 1
-
-
-	print("Error Count ", err_cnt)
-	print("Total Count ", ii)
-
-
-
-
-
-if __name__ == "__main__":main()
+if __name__ == '__main__':
+    main()

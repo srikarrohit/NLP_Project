@@ -105,43 +105,11 @@ SUSIE (StrUctured SummarIzEr) is a novel summarization method that exploits stru
 
 Many academic articles, especially in the life sciences domain follow the typical {\em IMRD} structure with sections like {\em introduction}, {\em background}, {\em methods}, {\em results} and {\em  conclusion}. When the abstract of the article is structured it usually  includes similar sections too. We employed a very simple method that looks for specific keywords in the header of each section in order to annotate both the article and abstract sections. For example, sections that include keywords like {\em methods}, {\em method}, {\em techniques} and {\em methodology} in their header are annotated as \textit{methods}. Table \ref{section_tags} presents the different section types and the keywords associated with them. 
 
-\begin{table}[t!]
-\begin{center}
-\setlength\tabcolsep{0.2cm}
-\begin{tabular}{|r|l|}
-\hline \textbf{section} & \textbf{keywords}\\\hline
-introduction & introduction, case\\
-literature & background, literature, related\\
-methods & methods, method, techniques, methodology\\
-results & result, results, experimental, experiments, experiment\\
-discussion & discussion, limitations\\
-conclusion & conclusion, conclusions, concluding\\
-\hline
-\end{tabular}
-\end{center}
-\caption{\label{section_tags} The different sections that we annotate and the keywords associated with them.}
-\end{table}
 
 Once the article and abstract sections are annotated, we pair each section of the full text with the corresponding section of the abstract and create one training example per section. We can then use one of the existing summarization methods and train a model for the summarization of single sections. Summarizing a single section of an article is a much easier task since the input and output sequences are a lot shorter and the information is more compact and focused on specific aspects of the article. In addition, section annotation allows us to filter out particular sections that are not useful for summarization.
 
 At test time we extract the specified sections of the article and run the summarization model for each of them in order to produce section summaries. Then we combine those summaries in order to get the full summary of the article.
 
-%\begin{table*}[t!]
-%\begin{center}
-%\begin{tabular}{|l|rrrr|}
-%\hline \textbf{name} & \textbf{\# articles} & \textbf{\# summaries} & \textbf{avg. article length} & \textbf{avg. summary length}\\
-% &  & \textbf{per article} & \textbf{(words)} & \textbf{(words)}\\\hline
-%DUC (2003-2004) & 500 & 4 & - & -\\
-%Gigaword & 10 million & 1 & 50 & 8\\
-%CNN / Daily Mail & 312,084 & 1 & 781 & 56\\
-%Newsroom & 1,321,995 & 1 & 658 & 26\\
-%TAC 2014 & 20 & 4 & 9,759 & 235\\ \hline
-%PMC-SA & 712,911 & 1 & 2,514 & 260\\
-%\hline
-%\end{tabular}
-%\end{center}
-%\caption{\label{data_stats} Different statistics of the existing datasets compared with PMC-SA. One can see that PMC-SA is different from the newswire datasets in terms of article and summary lengths. Also, it differs from the TAC 2014 dataset in terms of number of articles and summaries.}
-%\end{table*}
 
 \section{PMC Structured Abstracts}
 
@@ -149,37 +117,8 @@ PubMed Central (PMC) is a free digital repository that archives publicly accessi
 
 We can easily apply SUSIE on PMC-SA since the XML format allows us to effectively split the full text and abstract into annotated sections. In table \ref{per_sec_exp_stats} we show detailed statistics about the source and abstract length for each section type.
 
-\begin{table}[t!]
-\begin{center}
-\setlength\tabcolsep{0.2cm}
-\begin{tabular}{|r|rr|rr|}
-\hline & \multicolumn{2}{c|}{\textbf{Source length}} & \multicolumn{2}{c|}{\textbf{Abstract length}} \\ 
-\textbf{section type} & \textbf{mean} & \textbf{std} & \textbf{mean} & \textbf{std}\\\hline
-introduction & 570.26 & 381.40 & 58.25 & 41.00\\
-methods & 1,133.32 & 638.90 & 80.26 & 38.98 \\
-conclusion & 152.08 & 178.14 & 49.92 & 23.83 \\
-\hline
-\end{tabular}
-\end{center}
-\caption{\label{per_sec_exp_stats} Per section type number of words for the articles in the PMC-SA dataset.}
-\end{table}
-
 \section{Experiments}
 
-\begin{table*}[t!]
-\begin{center}
-\setlength\tabcolsep{0.1cm}
-\begin{tabular}{|r|cc|cc|cc|}
-\hline  & \multicolumn{2}{c|}{\textbf{ROUGE-1 F1}} & \multicolumn{2}{c|}{\textbf{ROUGE-2 F1}} & \multicolumn{2}{c|}{\textbf{ROUGE-L F1}}\\
-{\bf Model}  & {\bf Flat} & {\bf SUSIE} & {\bf Flat} & {\bf SUSIE} & {\bf Flat} & {\bf SUSIE} \\\hline
-attention sequence-to-sequence & 0.2833 & \textbf{0.3341} & 0.1043 & \textbf{0.1261} & 0.2619 & \textbf{0.3026} \\
-pointer-generator & 0.3020 & \textbf{0.3591} & 0.1020 & \textbf{0.1416} & 0.2726 & \textbf{0.3179}\\
-pointer-generator + coverage & 0.3300 & \textbf{0.3716} & 0.1142 & \textbf{0.1466} & 0.2893 & \textbf{0.3296}\\
-\hline
-\end{tabular}
-\end{center}
-\caption{\label{exp_results} Experimental results. Best result per evaluation measure is highlighted in bold typeface.}
-\end{table*}
 
 As we mentioned, SUSIE can be combined with a number of different summarization models. In order to evaluate the effectiveness of SUSIE the three different summarization models that were described in section \ref{sec:seq2seq_models} are trained and evaluated on PMC-SA using both the flat abstract method from section \ref{sec:flat_sum} and SUSIE.
 
@@ -187,20 +126,6 @@ As we mentioned, SUSIE can be combined with a number of different summarization 
 
 The training set has 641,994 articles, the validation set has 35,309 articles and the test set 10,111 articles. In all experiments we included for summarization only the {\em introduction}, {\em methods} and {\em conclusion} sections because we have found that these particular section selection gives us the best performing models. For the flat abstract method, the selected sections are concatenated and used as source input paired with the concatenation of the corresponding abstract sections as reference summary. For SUSIE one example is created for each of the selected sections with the corresponding abstract section as reference summary. In Tables \ref{exp_stats} we provide detailed statistics about the training data used in the two different methods.
 
-\begin{table}[t!]
-\begin{center}
-\setlength\tabcolsep{0.2cm}
-\begin{tabular}{|r|rr|}
-\hline & \textbf{Flat} & \textbf{SUSIE}\\\hline
-\# training articles & 641,994 & 641,994\\
-\# training examples & 641,994 & 1,211,826\\
-avg. source length (words)& 1,451 & 677\\
-avg. summary length (words)& 260 & 130\\
-\hline
-\end{tabular}
-\end{center}
-\caption{\label{exp_stats} Statistics about the training sets for the two experiments. In the flat abstract experiment each training example is an article and the whole abstract is used as reference summary. With SUSIE we create an average of 2 examples per article. The source inputs are article sections and the corresponding abstract sections are the reference summaries.}
-\end{table}
 
 \subsection{Experimental Setup}
 
@@ -238,26 +163,6 @@ In the appendix we illustrate the difference in the quality of the summaries pro
 \section{Conclusion}
 
 This work focused on the summarization of academic publications. We have shown that summarization models that perform well on smaller articles have difficulties when applied on longer articles with a lot of diverse information like academic articles. We proposed SUSIE, a novel approach that allowed us to successfully adapt existing summarization models to the task of structured summarization of academic articles. Also, we created PMC-SA, a new dataset of academic articles that is suitable for the training of summarization models using SUSIE. We found that training with SUSIE on the PMC-SA greatly improves the performance of summarization models and the quality of the generated summaries. 
-
-% \begin{table*}[t]
-
-% % \begin{center}
-% \begin{tabularx}{\linewidth}{|X|}
-
-% \hline \textbf{Reference Summary:} objective to examine the efficacy of psychological and psychosocial interventions for reductions in repeated self-harm. \\ 
-% design we conducted a systematic review , meta-analysis and meta-regression to examine the efficacy of psychological and psychosocial interventions to reduce repeat self-harm in adults. we included a sensitivity analysis of studies with a low risk of bias for the meta-analysis. for the meta-regression , we examined whether the type , intensity ( primary analyses ) and other components of intervention or methodology ( secondary analyses ) modified the overall intervention effect. data sources a comprehensive search of medline , psycinfo and embase ( from 1999 to june 2016 ) was performed. eligibility criteria for selecting studies randomised controlled trials of psychological and psychosocial interventions for adult self-harm patients. \\
-% conclusions consideration of a psychological or psychosocial intervention over and above treatment as usual is worthwhile ; with the public health benefits of ensuring that this practice is widely adopted potentially worth the investment. however , the specific type and nature of the intervention that should be delivered is not yet clear. cognitive–behavioural therapy or interventions with an interpersonal focus and targeted on the precipitants to self-harm may be the best candidates on the current evidence. further research is required.\\\hline
-
-% \textbf{Flat P-Gen + Coverage:} background clinically treated non-fatal self-harm ( we use the term self-harm henceforth ) is common in terms of adverse outcomes such as repetition of self-harm , suicide and all-cause mortality ; mental health morbidity , quality of life and physical , psychological and social functioning , mental health morbidity , quality of life and physical , psychological and social functioning. it is also costly in terms of immediate and ongoing treatment of self-harm of 16.3 \% after 1 year and 7 \% after 9 years. a more recent review of 177 studies from western and non-western countries indicated little change in these estimates , with reported repetition of self-harm of 16 \% , while the suicide rate was 1.6 \%\\\hline
-
-% \textbf{SUSIE P-Gen + Coverage:} objective to evaluate the efficacy of psychological and pharmacological interventions for reducing repetition of self-harm in unselected populations , but again highlight the poor quality of the evidence base in pooling data. in addition to these cochrane reviews , a number of trials have been published and several systematic reviews produced that aim to highlight what interventions are most often efficacious interventions ( cbt ) ( and not problem-solving therapy ) . \\
-% methods we searched medline , embase , and the cochrane central register of controlled controlled trials ( rct ) published up to february 2016 to identify randomized controlled trials evaluating the efficacy of psychological and psychosocial interventions to reduce repeat self-harm , ( primary outcome ) and to reduce suicidal ideation , depression and hopelessness ( secondary outcomes ) using meta-analysis ; and ( 2 ) examine whether the type , intensity or other specific components of the interventions , or study methodology , modify the pooled intervention effect using meta-regression analysis. \\
-% conclusions our study is consistent with the updated cochrane review , which in contrast to the original version showed no support for problem-focused ( predominantly problem-solving therapy ) interventions but a significant effect of interventions. our study has shown that psychological or psychosocial interventions are effective overall , with cbt and psychodynamic interpersonal therapy currently the most promising for implementation.\\\hline
-
-% \end{tabularx}
-% % \end{center}
-% \caption{\label{pg_cov} The generated summaries produced by the {\em pointer-generator with coverage} model trained with flat and structured abstracts for the same input article.}
-% \end{table*}
 
 % ---- Bibliography ----
 %

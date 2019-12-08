@@ -1,0 +1,123 @@
+
+\ label -LCB- sec : introduction -RCB-
+
+
+Noun compounds -LRB- NCs -RRB- such as -LCB- malaria mosquito -RCB- and \ textit -LCB- colon
+cancer tumor suppressor protein -RCB- are challenging for text processing
+since the relationship between the nouns they are composed of is
+implicit .
+NCs are abundant in English and understanding their semantics is
+important in many natural language processing -LRB- NLP -RRB- applications .
+For example , a question answering system might need to know whether
+-LCB- protein acting as a tumor suppressor -RCB- is a good paraphrase for
+-LCB- tumor suppressor protein -RCB- . Similarly , a machine translation
+system facing the unknown noun compound -LCB- Geneva headquarters -RCB-
+might translate it better if it could first paraphrase it as
+-LCB- Geneva headquarters of the WTO -RCB- .
+Given a query for -LCB- `` migraine treatment '' -RCB- , an
+information retrieval system could use paraphrasing verbs like
+-LCB- relieve -RCB- and -LCB- prevent -RCB- for query expansion and result
+ranking .
+
+Most work on noun compound interpretation has focused on two-word NCs .
+There have been two general lines of research :
+the first one derives the NC semantics from the semantics of the nouns it is made of -LCB- Rosario : 2002 , Moldovan : 2004 , Kim : 2005 , Girju : 2007a , Oseaghdha : 2009 , Tratz : 2010 -RCB- ,
+while the second one models the relationship between the nouns directly
+-LCB- Vanderwende : 1994 , Lapata : 2002 , Kim : 2006 , Nakov : 2006 : AIMSA , Nakov : 2008 , Butnariu : 2008 -RCB- .
+
+In either case , the semantics of an NC is typically expressed by an
+abstract relation like \ textsc -LCB- Cause -RCB- -LRB- e.g. , -LCB- malaria mosquito -RCB- -RRB- ,
+\ textsc -LCB- Source -RCB- -LRB- e.g. , -LCB- olive oil -RCB- -RRB- , or \ textsc -LCB- Purpose -RCB- -LRB- e.g. ,
+-LCB- migraine drug -RCB- -RRB- , coming from a small fixed inventory . Some
+researchers
+however , have argued for a more fine-grained , even infinite , inventory -LCB- Finin : 1980 -RCB- .
+Verbs are particularly useful in this respect and can capture elements
+of the semantics that the abstract relations can not .
+For example , while most NCs expressing \ textsc -LCB- Make -RCB- , can be
+paraphrased by common patterns like \ textit -LCB- be made of -RCB- and \ textit -LCB- be
+composed of -RCB- , some NCs allow more specific patterns , e.g. , -LCB- be
+squeezed from -RCB- for -LCB- orange juice -RCB- , and -LCB- be topped with -RCB- for
+\ textit -LCB- bacon pizza -RCB- .
+
+
+Recently , the idea of using fine-grained paraphrasing
+verbs for NC semantics has been gaining popularity
+-LCB- Butnariu : 2008 , Nakov : 2008 : AIMSA -RCB- ; there has also been a related
+shared task at SemEval-2010 -LCB- SemEval : 2010Paraphrase -RCB- . This
+interest is partly driven by practicality : verbs are directly usable
+as paraphrases . Still , abstract relations remain dominant since they
+offer a more natural generalization , which is useful for many NLP
+applications .
+
+One good contribution to this debate would be a direct study of the
+relationship between fine-grained and coarse-grained relations for NC
+interpretation . Unfortunately , the existing datasets do not allow this
+since they are tied to one particular granularity ; moreover , they only
+contain a few hundred NCs . Thus , our objective is to build a
+large-scale dataset of hundreds of thousands of NCs , each interpreted
+-LRB- 1 -RRB- by an abstract semantic relation and
+-LRB- 2 -RRB- by a set of paraphrasing verbs .
+Having such a large dataset would also help the overall advancement of the field .
+
+Since there is no universally accepted abstract relation inventory in
+NLP , and since we are interested in NC semantics from both a
+theoretical and a practical viewpoint , we chose the set of abstract
+relations proposed in the theory of \ newcite -LCB- Levi : 1978 -RCB- , which is
+dominant in theoretical linguistics and has been also used in NLP
+-LCB- Nakov : 2008 -RCB- .
+
+We use a two-step algorithm to jointly harvest NCs and patterns -LRB- verbs
+and prepositions -RRB- that interpret them for a given abstract relation .
+First , we extract NCs using a small number of seed patterns from a
+given abstract relation . Then , using the extracted NCs , we harvest
+more patterns . This is repeated until no new NCs and patterns can be
+extracted or for a pre-specified number of iterations .
+Our approach combines pattern-based extraction and bootstrapping ,
+which is novel for NC interpretation ; however , such combinations have
+been used in other areas , e.g. , named entity recognition
+-LCB- Riloff : 1999 , Thelen : 2002 , Curran : 2007 , McIntosh : 2009 -RCB- .
+
+
+
+The remainder of the paper is organized as follows :
+\ secref -LCB- sec : relatedwork -RCB- gives an overview of related work ,
+\ secref -LCB- sec : representation -RCB- motivates our semantic representation ,
+Sections \ ref -LCB- sec : method -RCB- , \ ref -LCB- sec : data -RCB- , and \ ref -LCB- sec : experiment -RCB-
+explain our method , dataset and experiments , respectively ,
+\ secref -LCB- sec : discussion -RCB- discusses the results ,
+\ secref -LCB- sec : erroranalysis -RCB- provides error analysis ,
+and \ secref -LCB- sec : conclusion -RCB- concludes with suggestions for future work .
+
+
+
+% ==================================================================
+@label
+
+
+Responding to the need for semantic lexical resources in natural
+language processing applications , we examine methods to acquire noun
+compounds -LRB- NCs -RRB- , e
+@label
+g
+@label
+, \ emph -LCB- orange juice -RCB- , together with suitable
+fine-grained semantic interpretations , e
+@label
+g
+@label
+, \ emph -LCB- squeezed from -RCB- ,
+which are directly usable as paraphrases
+@label
+We employ bootstrapping
+and web statistics , and utilize the relationship between NCs and
+paraphrasing patterns to jointly extract NCs and such patterns in
+multiple alternating iterations
+@label
+In evaluation , we found that having
+one compound noun fixed yields both a higher number of semantically
+interpreted NCs and improved accuracy due to stronger semantic
+restrictions
+@label
+
+
+

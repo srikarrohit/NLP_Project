@@ -15,7 +15,7 @@ if len(sys.argv) <= 2:
 	exit()
 else:
 	top_k = int(sys.argv[1])
-	file = open(sys.argv[2],'r')
+	file = open(sys.argv[2],'r',encoding='utf-8')
 	text = file.read()
 
 #text = "In Our Time is Ernest Hemingway's first collection of short stories, published in 1925 by Boni and Liveright, New York. Its title is derived from the English Book of Common Prayer, \"Give peace in our time, O Lord\". The collection's publication history was complex. It began with six prose vignettes commissioned by Ezra Pound for a 1923 edition of The Little Review. Hemingway added twelve more and in 1924 compiled the in our time edition (with a lower-case title), which was printed in Paris. To these were added fourteen short stories for the 1925 edition, including \"Indian Camp\" and \"Big Two-Hearted River\", two of his best-known Nick Adams stories. He composed \"On the Quai at Smyrna\" for the 1930 edition. The stories' themes – of alienation, loss, grief, separation – continue the work Hemingway began with the vignettes, which include descriptions of acts of war, bullfighting and current events. The collection is known for its spare language and oblique depiction of emotion, through a style known as Hemingway's \"theory of omission\" (Iceberg Theory). According to his biographer Michael Reynolds, among Hemingway's canon, \"none is more confusing ... for its several parts – biographical, literary, editorial, and bibliographical – contain so many contradictions that any analysis will be flawed.\" Hemingway's writing style attracted attention with literary critic Edmund Wilson saying it was \"of the first destinction\"; the 1925 edition of In Our Time is considered one of Hemingway's early masterpieces."
@@ -68,8 +68,8 @@ def idf_mod_cos(sent1,sent2,word_idf):
 	for word in sent1_dict:
 		if word in sent2_dict:
 			similarity += sent1_dict[word]*sent2_dict[word]*word_idf[word]*word_idf[word]
-	similarity /= sum([(sent1_dict[word]*word_idf[word])**2 for word in sent1_dict])**-2
-	similarity /= sum([(sent2_dict[word]*word_idf[word])**2 for word in sent2_dict])**-2
+	similarity /= (sum([(sent1_dict[word]*word_idf[word])**2 for word in sent1_dict])+0.0000000001)**-2
+	similarity /= (sum([(sent2_dict[word]*word_idf[word])**2 for word in sent2_dict])+0.0000000001)**-2
 
 	return similarity
 
@@ -89,7 +89,7 @@ def text_rank_sent(graph,node_weights,d=.85,iter=20):
 		for i in range(len(node_weights)):
 			temp = 0.0
 			for j in range(len(node_weights)):
-				temp += graph[i,j]*node_weights[j]/weight_sum[j]
+				temp += (graph[i,j]*node_weights[j]/(weight_sum[j]++0.0000000001))
 			node_weights[i] = 1-d+(d*temp)
 		iter-=1
 

@@ -1,0 +1,79 @@
+
+Contextualized representations trained over large-scale text data have given remarkable improvements to a wide range of NLP tasks , including natural language inference -LCB- Bowman2015ALA -RCB- , question answering -LCB- rajpurkar-etal-2018-know -RCB- and reading comprehension -LCB- Lai2017RACELR -RCB- . Giving new state-of-the-art results that approach or surpass human performance on several benchmark datasets , it is an interesting question what types of knowledge are learned in pre-trained contextualized representations in order to better understand how they benefit the NLP problems above . There has been work investigating the nature of syntactic -LCB- liu-etal-2019-linguistic -RCB- , semantic -LCB- liu-etal-2019-linguistic -RCB- and word sense -LCB- kim-etal-2019-probing -RCB- knowledge contained in such contextualized representations , in particular BERT -LCB- devlin-etal-2019-bert -RCB- , showing that such knowledge can be effectively learned via language model -LRB- LM -RRB- pre-training over large scale data .
+
+Commonsense knowledge spans `` a huge portion of human experience , encompassing
+knowledge about the spatial , physical , social , temporal , and
+psychological aspects of typical everyday life . '' -LCB- Liu2004ConceptNetA -RCB- . Intuitively , such knowledge is at least as useful as semantic and syntactic knowledge in natural language inference , reading comprehension and coreference resolution . For example , the word `` it '' in the sentence `` the dog can not cross the street because it is too X '' can refer to three different entities when the word `` X '' is `` timid '' , `` wide '' and `` dark '' , respectively , and resolving such ambiguity can require that a system has relevant commonsense knowledge beyond the sentence level . However , relatively little work has been conducted on systematically evaluating the nature of commonsense knowledge learned in contextualized representations .
+
+\ begin -LCB- table * -RCB- -LSB- ! htbp -RSB-
+\ centering
+% \ resizebox -LCB- 0.95 \ textwidth -RCB- -LCB- ! -RCB- -LCB- % If your table exceeds the column or page width , use this command to reduce it slightly
+\ begin -LCB- tabular -RCB- -LCB- cl c c -RCB-
+\ toprule
+& \ hfill Token-level & \ \
+\ hline
+CA & They broadcast an announcement , \ textbf -LCB- but -RCB- a subway came into the station and I could n't hear it . & \ cmark \ \
+& They broadcast an announcement , \ textbf -LCB- before -RCB- a subway came into the station and I could n't hear it . & \ xmark \ \
+\ hline
+WSC & The trophy does n't fit into the brown suitcase because the \ textbf -LCB- trophy -RCB- is too large . & \ cmark \ \
+& The trophy does n't fit into the brown suitcase because the \ textbf -LCB- suitcase -RCB- is too large . & \ xmark \ \
+\ hline
+SM & money can be used for buying \ textbf -LCB- cars -RCB- & \ cmark \ \
+& money can be used for buying \ textbf -LCB- stars -RCB- & \ xmark \ \
+\ toprule
+& \ hfill Sentence-level & \ \
+\ hline
+SMR & $ \ neg $ `` he put an elephant into the fridge '' -LRB- because -RRB- $ \ leftarrow $ an elephant is much bigger than a fridge . & \ cmark \ \
+& $ \ neg $ `` he put an elephant into the fridge '' -LRB- because -RRB- $ \ leftarrow $ elephants are usually gray ... & \ xmark \ \
+& $ \ neg $ `` he put an elephant into the fridge '' -LRB- because -RRB- $ \ leftarrow $ an elephant can not eat a fridge . & \ xmark \ \
+\ hline
+SWAG & Someone unlocks the door and they go in . $ \ rightarrow $ Someone leads the way in . & \ cmark \ \
+& Someone unlocks the door and they go in . $ \ rightarrow $ Someone opens the door and walks out . & \ xmark
+\ \
+& Someone unlocks the door and they go in . $ \ rightarrow $ Someone walks out of the driveway . & \ xmark \ \
+& Someone unlocks the door and they go in . $ \ rightarrow $ Someone walks next to someone and sits on a pew . & \ xmark \ \
+\ hline
+HellaSwag & A carved pumpkin with a light in it glows on a counter . Supplies for carving are then shown . & \ \
+& $ \ rightarrow $ A woman cuts the top off the pumpkin , emptying the seeds . & \ cmark \ \
+& $ \ rightarrow $ she cuts down all the pieces and dumps them in a trash bin in the end . & \ xmark \ \
+& $ \ rightarrow $ she then carves the traced lines to cut out the design . & \ xmark \ \
+& $ \ rightarrow $ she tapes the top shut as the continue carving the pumpkin . & \ xmark \ \
+\ hline
+ARCT & People can choose not to use Google $ \ wedge $ Other search engines do n't redirect to Google \ \ & $ \ rightarrow $ Google is not a harmful monopoly & \ cmark \ \
+& People can choose not to use Google $ \ wedge $ All other search engines redirect to Google \ \ & $ \ rightarrow $ Google is not a harmful monopoly & \ xmark \ \
+\ toprule
+
+\ end -LCB- tabular -RCB-
+% -RCB-
+\ caption -LCB- Example of reframed test instances corresponding to each of our test task . The key word is \ textbf -LCB- bolded -RCB- in token-level tasks . $ \ wedge $ , $ \ neg $ , $ \ leftarrow $ and $ \ rightarrow $ are used for showing the logic flows and replaced by natural language in actual test data . -RCB- \ smallskip
+\ label -LCB- table1 -RCB-
+\ end -LCB- table * -RCB-
+
+We fill this gap by evaluating five state-of-the-art contextualized embedding models on seven commonsense benchmarks . The models include off-the-shelf embeddings \ footnote -LCB- https://github.com/huggingface/transformers -RCB- from GPT -LCB- rad-2018 -RCB- , GPT2 -LCB- radford2019language -RCB- , BERT -LCB- devlin-etal-2019-bert -RCB- , XLNet -LCB- zhilin-19 -RCB- and RoBERTa -LCB- liu2019roberta -RCB- , and the benchmarks include Conjunction Acceptability , Sense Making -LCB- wang-etal-2019-make -RCB- , Winograd Schema Challenge -LCB- Levesque : 2012 : WSC : 3031843.3031909 -RCB- , SWAG -LCB- zellers-etal-2018-swag -RCB- , HellaSwag -LCB- zellers-etal-2019-hellaswag -RCB- , Sense Making with Reasoning -LCB- wang-etal-2019-make -RCB- , and Argument Reasoning Comprehension -LCB- habernal-etal-2018-argument -RCB- . We evaluate commonsense knowledge contained in the above models by unifying the form of all the datasets and comparing LM perplexities on positive and negative samples -LRB- i.e. , sentences that make sense and those that do not make sense , respectively -RRB- . Commonsense contained in our data covers a wide range of subjects , from physical world knowledge to social conventions , from scientific domains to daily life scenes . We further categorize them by the difficulty level , namely the number of inference steps necessary in making sense .
+
+We reframe the datasets in order to conduct both word - and sentence-level testing . For word-level testing , negative samples are drawn by replacing words from positive samples . We are concerned about nouns , verbs , adjectives , adverbs , pronouns and conjunctions , which reflect different aspects of commonsense . For example , while verbs such as `` buy , throw , sell ... '' are relatively more associated with event knowledge , conjunctions such as `` because , but , so ... '' are more associated with logical reasoning . For sentence-level testing , negative examples are drawn by replacing a full subsentences -LRB- such as a clause -RRB- with irrelevant or conflicting contents . Sentence-level tests concern more about commonsense inference .
+
+From the results we have four salient observations . First , the pre-trained models give consistently better performances than random baselines , which demonstrates that language model pre-training is useful for learning commonsense knowledge . Second , models based on bi-directional contexts such as BERT , XLNet and RoBERTa are stronger in learning commonsense knowledge compared to those based on uni-directional contexts , such as GPT and GPT2 . Third , more commonsense knowledge can be learned from larger training sets , which conforms well to the intuition . Fourth , the models have a certain degree of commonsense reasoning ability . However , as the number of necessary inference steps increase , the model performances drop , which shows that commonsense is still a big challenge that is not completely solved by pre-trained contextualized language models -LRB- LMs -RRB- .
+
+Finally , we further test the robustness of the five models by making dual test samples . Here a dual test sample is built by adding , deleting and replacing words in a test sample , or swapping two words in the sample , thereby resulting in a closely related test case . In theory , a model equipped with relevant commonsense should give consistent predictions on a pair of dual test cases . However , we find that none of the models are able to reach such consistency . Instead , the models are confused by the modification , tending to give the same predictions over a pair of dual samples despite they may have different gold labels . This further reveals that commonsense contained in the pre-trained models may remain in a surface level , without deep semantic comprehension . We publicly release our datasets , named commonsense ability tests -LRB- CATs -RRB- , and the test script at GitHub . \ footnote -LCB- https://github.com/XuhuiZhou/CATS -RCB-
+
+@label
+
+Contextualized representations trained over large raw text data have given remarkable improvements for NLP tasks including question answering and reading comprehension
+@label
+There have been works showing that syntactic , semantic and word sense knowledge are contained in such representations , which explains why they benefit such tasks
+@label
+However , relatively little work has been done investigating commonsense knowledge contained in contextualized representations , which is crucial for human question answering and reading comprehension
+@label
+We study the commonsense ability of GPT , BERT , XLNet , and RoBERTa by testing them on seven challenging benchmarks , finding that language modeling and its variants are effective objectives for promoting models ' commonsense ability while bi-directional context and larger training set are bonuses
+@label
+We additionally find that current models do poorly on tasks require more necessary inference steps
+@label
+Finally , we test the robustness of models by making dual test cases , which are correlated so that the correct prediction of one sample should lead to correct prediction of the other
+@label
+Interestingly , the models show confusion on these test cases , which suggests that they learn commonsense at the surface rather than the deep level
+@label
+We release a test set , named CATs publicly , for future research
+@label
+
+

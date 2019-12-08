@@ -1,0 +1,57 @@
+\ label -LCB- sec : intro -RCB-
+In the wake of the DARTS 's open-sourcing -LCB- liu2018darts -RCB- , a diverse number of its variants emerge in the -LCB- neural architecture search -RCB- community . Some of them extend its use in higher-level architecture search spaces with performance awareness in mind -LCB- cai2018proxylessnas , wu2018fbnet -RCB- , some learn a stochastic distribution instead of architectural parameters -LCB- wu2018fbnet , xie2018snas , zheng2019multinomial , dong2019one , dong2019searching -RCB- , and others offer remedies on discovering its lack of robustness -LCB- nayman2019xnas , chen2019progressive , liang2019darts , li2019stacnas , zela2019understanding -RCB- .
+
+\ begin -LCB- figure -RCB- -LSB- ht -RSB-
+\ centering
+\ includegraphics -LSB- scale = 0.6 -RSB- -LCB- knight-vs-darts-imagenet-dominant-op . pdf -RCB-
+% \ vskip -0.2 in
+\ caption -LCB- The number of dominant operations -LRB- in all 19 layers -RRB- of DARTS and Fair DARTS searching on ImageNet -LRB- in search space $ S _ 2 $ -RRB- . In DARTS , skip connections incrementally suppress others . In Fair DARTS , all operations develop independently . -RCB-
+\ label -LCB- fig : num-skip-imagenet -RCB-
+\ end -LCB- figure -RCB-
+
+In spite of these endeavors , % why is random sampling also competitive -LCB- li2019random , sciuto2019evaluating -RCB- in the DARTS 's search space ?
+Why is there an obvious increase in the number of skip connections -LCB- chen2019progressive -RCB- ? -LRB- see Figure \ ref -LCB- fig : num-skip-imagenet -RCB- -RRB- What makes a one-hot pruned subnetwork perform poorly while its supernet \ footnote -LCB- Despite minor ambiguities and for simplicity , we hereby refer to the overall network that encompasses all child models as a ` supernet ' . -RCB- converges quite well -LCB- zela2019understanding -RCB- ?
+
+In this paper , we mainly discuss in-depth about these failure modes of DARTS . In particular , the ResNet -LCB- he2016deep -RCB- - like nature of skip connections interferes with the training of the supernet , which continues boosting their priors against others . Meanwhile , such dominant skip connections in the continuous supernet ca n't directly be discretized , otherwise causing a dramatic performance drop . To avoid these two major issues , we propose a novel approach named Fair DARTS , in which we discuss current robustifying methods -LCB- chen2019progressive , liang2019darts , zela2019understanding -RCB- on DARTS with a unified fairness perspective . To summarize , we have the following contributions .
+
+\ textbf -LCB- Firstly -RCB- , we discover two major causes that hinder better performance of DARTS . The first is what we later define as an \ textbf -LCB- unfair advantage -RCB- that drives skip connections into a monopoly state in an \ textbf -LCB- exclusive competition -RCB- . These two indispensable factors work together to induce a performance collapse . The second is the inherent inequality lying in discretization that can produce a dramatic discrepancy .
+
+\ textbf -LCB- Secondly -RCB- , we propose the first -LCB- collaborative competition -RCB- approach to resolve these two issues . By offering each operation an independent architectural weight , the unfair advantage no longer prevails . We again minimize the discretization gap with a novel auxiliary loss , called -LCB- zero-one loss -RCB- , to steer architectural weights towards their extremities , that is , either completely enabled or disabled . The inequality thus decreases to its minimum .
+
+
+\ textbf -LCB- Thirdly -RCB- , we provide a unified perspective to view current DARTS cures for skip connections . The majority of these works either make use of dropout -LCB- srivastava2014dropout -RCB- on skip connections -LCB- chen2019progressive , zela2019understanding -RCB- , or play with the later termed -LCB- boundary epoch -RCB- by different early-stopping strategies -LCB- liang2019darts , zela2019understanding -RCB- . We instead , fundamentally eliminate unfair competition with no other restrictions at all . Moreover , based on our observations , we derive a hypothesis that adding Gaussian noise can also disrupt the unfairness , which is later proved to be effective .
+
+% Moreover , as a direct anti-collapse strategy guided by our observations , a simple trick on DARTS can also easily alleviate that collapse .
+
+\ textbf -LCB- Lastly -RCB- , we conduct thorough experiments in two widely used search spaces in both proxy and proxyless ways . Results show that our method can escape from performance collapse . We also achieve state-of-the-art networks on CIFAR-10 and ImageNet .
+
+@label
+
+Differential Architecture Search -LRB- DARTS -RRB- is now a widely disseminated weight-sharing neural architecture search method
+@label
+However , there are two fundamental weaknesses remain untackled
+@label
+First , we observe that the well-known aggregation of skip connections during optimization is caused by an \ textbf -LCB- unfair advantage -RCB- in an \ textbf -LCB- exclusive competition -RCB-
+@label
+Second , there is a non-negligible incongruence when discretizing continuous architectural weights to a one-hot representation
+@label
+Because of these two reasons , DARTS delivers a biased solution that might not even be suboptimal
+@label
+
+In this paper , we present a novel approach to curing both frailties
+@label
+Specifically , as unfair advantages in a pure exclusive competition easily induce a monopoly , we relax the choice of operations to be collaborative , where we let each operation have an equal opportunity to develop its strength
+@label
+We thus call our method Fair DARTS
+@label
+Moreover , we propose a \ textbf -LCB- zero-one -RCB- loss to directly reduce the discretization gap
+@label
+Experiments are performed on two mainstream search spaces , in which we achieve new state-of-the-art networks on ImageNet
+@label
+Our code is available here \ footnote -LCB-
+\ url -LCB- https://github
+@label
+com/xiaomi-automl/fairdarts -RCB- -RCB-
+@label
+
+
