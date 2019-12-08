@@ -37,9 +37,7 @@ def main():
                 try:    
                     file = codecs.open(basepath+foldername+'/'+filename,'r','utf-8')
                     s = file.read()
-                    print(1)
                     parsed_text = LatexNodes2Text().latex_to_text(s)
-                    print(2)
                     text = text+parsed_text
                 except:
                     print('Error',foldername,filename)

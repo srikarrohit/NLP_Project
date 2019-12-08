@@ -11,11 +11,13 @@ import sys
 
 math = sys.argv[1]
 
-basepath_orig = \
-    "C:\Users\srika\OneDrive\Documents\Document-Summarization-master\Document-Summarization-master\Dest_files"
+basepath_orig = "../Dest_files/"
 
-destpath_new = \
-    "C:\Users\srika\OneDrive\Documents\Document-Summarization-master\Document-Summarization-master\Dest_files1"
+destpath_new = "../Dest_files1/"
+
+basepath = destpath_new
+
+destpath = "../Dest_path/summary.txt"
 
 # basepath = "/home/du3/13CS30043/SNLP/Dataset/Papers_Text_Without_Eq_Cat/"
 # destpath = "/home/du3/13CS30043/SNLP/Dataset/all-parsed-papers-category.txt"
@@ -68,6 +70,16 @@ def remove_math():
         binary_string += bin
 
     print('[^ ]*[' + symbol_string + '][^ ]*')
+    
+    regex_symbol = re.compile(" [^ @#]*["+symbol_string+"][^ ]* ", re.U)
+
+    regex_binary= re.compile(" [^ @#]* ["+binary_string+"] [^ ]* ", re.U)
+
+    regex_min = re.compile(" [^ ]*[_][^ ]* ", re.U)
+
+    regex_1 = re.compile(" [a-zA-Z]+[ ]?[-/][ ]?[a-zA-Z]+ ", re.U)
+
+    regex_2 = re.compile(" [^a-zA-Z ]+[ ]?[-/][ ]?[^a-zA-Z ]+ ", re.U)
 
     for filename in files:
         file = codecs.open(basepath_orig + filename, 'r', 'utf-8')
@@ -109,7 +121,7 @@ def remove_math():
             cnt = cnt + m.end() - m.start() - len(' ||SYMBOLTOKEN|| ')
 
         print(text, file=destfile)
-        print(filename)
+        #print(filename)
 
 
 def main():
@@ -119,7 +131,7 @@ def main():
 
     files = os.listdir(basepath)
 
-    destfile = codecs.open(destpath, 'w', 'utf-8')
+    #destfile = codecs.open(destpath, 'w', 'utf-8')
 
     err_cnt = 0
     ii = 0
@@ -161,7 +173,7 @@ def main():
             dict_file = collections.OrderedDict()
 
             for row in file:
-
+                #print(row)
                 if row.strip() == '@#^T':
                     title_f = False
                     continue
@@ -169,7 +181,6 @@ def main():
                     abstract_f = False
                     continue
                 elif row.strip() == '@@@FORMULA@@@':
-
                     formula_f = False
                     continue
                 elif row.strip() == '@@@TABLE@@@':
@@ -281,14 +292,16 @@ def main():
                     section_s = False
                 elif row.strip() == '###FORMULA###':
 
-                    row = '||FORMULA||'
+                    #row = '||FORMULA||'
+                    row = ''
                     formula_f = True
                 elif row.strip() == '###TABLE###':
-                    row = '||TABLE||'
+                    #row = '||TABLE||'
+                    row = ''
                     table_f = True
                 elif row.strip() == '###FIGURE###':
-
-                    row = '||FIGURE||'
+                    #row = '||FIGURE||'
+                    row = ''
                     figure_f = True
                 elif row.strip() == '@#S!S':
 
@@ -320,12 +333,13 @@ def main():
                     dict_file[section_head][1][sub_section_head][1][sub_sub_section_head][0] = \
                         dict_file[section_head][1][sub_section_head][1][sub_sub_section_head][0] \
                         + row
-            print(filename)
 
             if dict_file != collections.OrderedDict():
-                print(str(filename) + '\t' + str(title.strip()) + '\t'
+                with open(destpath, 'w') as f:
+                    #print('Filename:', filename, file=f)  # Python 3.x
+                    print(str(filename) + '\t' + str(title.strip()) + '\t'
                       + json.dumps(dict_file) + '\t'
-                      + abstract.strip(), file=destfile)
+                      + abstract.strip(), file=f)
 
                 ii = ii + 1
         except:
